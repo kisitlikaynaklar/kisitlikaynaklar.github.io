@@ -1930,6 +1930,7 @@ p code,li code {
 pre {
   white-space: pre;
   overflow-x: auto;
+  background-color: #f2f2f2;
   border: 1px solid #999;
   page-break-inside: avoid;
 }
@@ -2223,7 +2224,7 @@ body.slide {
 /*      Responsive      */
 
 @media screen and (max-width:1140px) {
-    
+
   #header,
     #posts-container,
     .entry .text,
@@ -2256,7 +2257,7 @@ body.slide {
 }
 
 @media screen and (max-width:500px) {
-    
+
   a#slide {
     position: absolute;
   }
