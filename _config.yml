@@ -1,5 +1,5 @@
-title:            Site Title
-description:      Site description for the metas.
+title:            Kisitlikaynaklar
+description:      Kaynaklar kisitli.
 logo:             omikron.png
 disqus_shortname: shortname
 # Assign a default image for your site's header and footer
@@ -85,7 +85,7 @@ sitemap:
         - "/index.html"
 
 # http://en.wikipedia.org/wiki/List_of_tz_database_time_zones
-timezone:    America/New_York
+timezone:    Europe/London
 future:      true
 markdown:    kramdown
 highlighter: rouge
