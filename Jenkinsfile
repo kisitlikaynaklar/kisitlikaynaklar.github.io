@@ -60,7 +60,7 @@ stage('Merge'){
       $class: 'GitSCM',
       branches: [[name: 'refs/heads/dev']],
       userRemoteConfigs: [[
-        credentialsId: credentialsId,
+        credentialsId: gitID,
         name: 'origin',
         url: giturl
       ]],
