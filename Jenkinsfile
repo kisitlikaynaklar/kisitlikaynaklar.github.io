@@ -3,23 +3,35 @@
 String giturl = 'https://github.com/kisitlikaynaklar/kisitlikaynaklar.github.io'
 String gitID = '999d62df-f2af-443c-935b-31c16ed196bb'
 
+def WebTest = {
+  sh 'echo $HOSTNAME'
+  sh '/usr/local/bin/web-test.sh'
+}
+
+def WebInstall = {
+  sh "bundle install"
+}
+
+def WebBuild = {
+  sh "jekyll build"
+  sh '''
+  rm -rf /var/www/html/*
+  mv _site/* /var/www/html/
+  cp htaccess /var/www/html/.htaccess
+  chown -R apache:apache /var/www/html
+  '''
+}
+
 stage('Dev Environment'){ // for display purposes
   node('web-dev') {
     stage('Prepare') { // for display purposes
-      // Get some code from a GitHub repository
       git branch: 'dev', credentialsId: gitID, url: giturl
     }
     stage('Install') {
-      sh "bundle install"
+      WebInstall()
     }
     stage('Build') {
-      sh "jekyll build"
-      sh '''
-      rm -rf /var/www/html/*
-      mv _site/* /var/www/html/
-      cp htaccess /var/www/html/.htaccess
-      chown -R apache:apache /var/www/html
-      '''
+      WebBuild()
     }
     step([$class: 'WsCleanup'])
   }
@@ -27,7 +39,7 @@ stage('Dev Environment'){ // for display purposes
 
 stage('Dev-Test'){
   node('web-dev') {
-    sh 'echo $HOSTNAME && /usr/local/bin/web-test.sh'
+    WebTest()
   }
 }
 
@@ -53,7 +65,7 @@ timeout(time:1, unit:'MINUTES') {
     input message:'Approve deployment?', ok: 'Go ahead'
 }
 
-stage('Merge'){
+stage('Merge dev to master'){
   node{
     checkout([
       $class: 'GitSCM',
