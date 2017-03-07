@@ -23,7 +23,6 @@ def WebBuild = {
 }
 
 def GitMerge = {
-  repo = 'github.com/kisitlikaynaklar/kisitlikaynaklar.github.io'
   checkout([
     $class: 'GitSCM',
     branches: [[name: 'refs/heads/dev']],
@@ -48,6 +47,7 @@ def GitMerge = {
     ]]
   ])
   withCredentials([[$class: 'UsernamePasswordMultiBinding', credentialsId: gitID, usernameVariable: 'gitUsername', passwordVariable: 'gitPassword']]) {
+    repo = 'github.com/kisitlikaynaklar/kisitlikaynaklar.github.io'
     sh('git push https://${gitUsername}:${gitPassword}@${repo}')
   }
 }
