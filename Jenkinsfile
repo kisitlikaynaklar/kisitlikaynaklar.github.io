@@ -51,12 +51,6 @@ def GitMerge = {
   }
 }
 
-stage('Merge'){
-  node{
-    GitMerge()
-  }
-}
-
 stage('Dev Environment'){ // for display purposes
   node('web-dev') {
     stage('Prepare') { // for display purposes
