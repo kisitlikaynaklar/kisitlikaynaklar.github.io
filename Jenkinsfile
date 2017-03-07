@@ -43,12 +43,15 @@ def GitMerge = {
     ],
     [
       $class: 'LocalBranch',
-      localBranch: 'dev'
+      localBranch: 'master'
     ]]
   ])
   withCredentials([[$class: 'UsernamePasswordMultiBinding', credentialsId: gitID, usernameVariable: 'gitUsername', passwordVariable: 'gitPassword']]) {
     sh('git push https://${gitUsername}:${gitPassword}@github.com/kisitlikaynaklar/kisitlikaynaklar.github.io')
-}
+  }
+  stage('Checkout') {
+       git branch: 'master', credentialsId: 'gitID, url: 'git@github.com:kisitlikaynaklar/kisitlikaynaklar.github.io'
+  }
 }
 
 stage('Merge'){
