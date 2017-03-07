@@ -1,10 +1,13 @@
-#!/bin/groovy
+#!groovy
+
+String giturl = 'https://github.com/kisitlikaynaklar/kisitlikaynaklar.github.io'
+String gitID = '999d62df-f2af-443c-935b-31c16ed196bb'
 
 stage('Dev Environment'){ // for display purposes
   node('web-dev') {
     stage('Prepare') { // for display purposes
       // Get some code from a GitHub repository
-      git branch: 'dev', credentialsId: '999d62df-f2af-443c-935b-31c16ed196bb', url: 'https://github.com/kisitlikaynaklar/kisitlikaynaklar.github.io'
+      git branch: 'dev', credentialsId: gitID, url: giturl
     }
     stage('Install') {
       sh "bundle install"
@@ -51,13 +54,38 @@ timeout(time:1, unit:'MINUTES') {
 }
 
 stage('Merge'){
-  build job: 'web-stage-test'
+  node{
+    checkout([
+      $class: 'GitSCM',
+      branches: [[name: 'refs/heads/dev']],
+      userRemoteConfigs: [[
+        credentialsId: '999d62df-f2af-443c-935b-31c16ed196bb',
+        name: 'origin',
+        url: giturl
+      ]],
+      extensions: [
+      [
+        $class: 'PreBuildMerge',
+        options: [
+          fastForwardMode: 'NO_FF',
+          mergeRemote: 'origin',
+          mergeStrategy: 'MergeCommand.Strategy',
+          mergeTarget: 'master'
+        ]
+      ],
+      [
+        $class: 'LocalBranch',
+        localBranch: 'master'
+      ]]
+    ])
+  }
 }
+
 
 stage('Production'){
   node('web-prod') {
     stage('Prepare') {
-      git branch: 'master', credentialsId: '999d62df-f2af-443c-935b-31c16ed196bb', url: 'https://github.com/kisitlikaynaklar/kisitlikaynaklar.github.io'
+      git branch: 'master', credentialsId: gitID, url: giturl
     }
     stage('Install') {
       sh "bundle install"
@@ -85,5 +113,7 @@ stage('Tests') {
   }
 }
 stage('Result') {
-      sh 'echo cokta guzel oldu pekte guzel oldu taam mi'
+  node(){
+    sh 'echo cokta guzel oldu pekte guzel oldu taam mi'
+  }
 }
