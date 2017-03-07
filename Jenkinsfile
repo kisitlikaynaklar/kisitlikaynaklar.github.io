@@ -2,7 +2,7 @@
 
 String gitUrl = 'https://github.com/kisitlikaynaklar/kisitlikaynaklar.github.io'
 String gitID = '999d62df-f2af-443c-935b-31c16ed196bb'
-String repo = 'github.com/kisitlikaynaklar/kisitlikaynaklar.github.io'
+repo = 'github.com/kisitlikaynaklar/kisitlikaynaklar.github.io'
 
 def WebTest = {
   sh 'echo $HOSTNAME'
