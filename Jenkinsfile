@@ -2,6 +2,7 @@
 
 String gitUrl = 'https://github.com/kisitlikaynaklar/kisitlikaynaklar.github.io'
 String gitID = '999d62df-f2af-443c-935b-31c16ed196bb'
+String repo = 'github.com/kisitlikaynaklar/kisitlikaynaklar.github.io'
 
 def WebTest = {
   sh 'echo $HOSTNAME'
@@ -47,10 +48,7 @@ def GitMerge = {
     ]]
   ])
   withCredentials([[$class: 'UsernamePasswordMultiBinding', credentialsId: gitID, usernameVariable: 'gitUsername', passwordVariable: 'gitPassword']]) {
-    sh('git push https://${gitUsername}:${gitPassword}@github.com/kisitlikaynaklar/kisitlikaynaklar.github.io')
-  }
-  stage('Checkout') {
-       git branch: 'master', credentialsId: 'gitID, url: 'git@github.com:kisitlikaynaklar/kisitlikaynaklar.github.io'
+    sh('git push https://${gitUsername}:${gitPassword}@${repo}')
   }
 }
 
