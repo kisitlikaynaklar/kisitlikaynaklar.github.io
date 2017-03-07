@@ -2,7 +2,6 @@
 
 String giturl = 'https://github.com/kisitlikaynaklar/kisitlikaynaklar.github.io'
 String gitID = '999d62df-f2af-443c-935b-31c16ed196bb'
-def credentialsId = scm.userRemoteConfigs[0].credentialsId
 
 stage('Dev Environment'){ // for display purposes
   node('web-dev') {
