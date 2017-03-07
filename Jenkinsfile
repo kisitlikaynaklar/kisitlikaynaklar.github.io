@@ -50,9 +50,8 @@ def GitMerge = {
 
 stage('Merge'){
   node{
-    git branch: 'master', credentialsId: gitID, url: gitUrl
+
     GitMerge()
-    step([$class: 'WsCleanup'])
   }
 }
 
