@@ -111,6 +111,7 @@ timeout(time:1, unit:'MINUTES') {
 
 stage('Merge'){
   node{
+    git branch: 'dev', credentialsId: gitID, url: gitUrl
     GitMerge()
     step([$class: 'WsCleanup'])
   }
