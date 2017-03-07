@@ -43,7 +43,7 @@ def GitMerge = {
     ],
     [
       $class: 'LocalBranch',
-      localBranch: 'master'
+      localBranch: 'dev'
     ]]
   ])
 }
