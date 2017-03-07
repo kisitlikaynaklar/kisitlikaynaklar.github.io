@@ -47,7 +47,7 @@ def GitMerge = {
     ]]
   ])
   withCredentials([[$class: 'UsernamePasswordMultiBinding', credentialsId: gitID, usernameVariable: 'gitUsername', passwordVariable: 'gitPassword']]) {
-    sh('git push https://${gitUsername}:${gitPassword}@${gitUrl}')
+    sh('git push https://${gitUsername}:${gitPassword}@github.com/kisitlikaynaklar/kisitlikaynaklar.github.io')
 }
 }
 
