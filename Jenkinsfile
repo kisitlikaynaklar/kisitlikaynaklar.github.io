@@ -1,6 +1,6 @@
 #!groovy
 
-String giturl = 'https://github.com/kisitlikaynaklar/kisitlikaynaklar.github.io'
+String gitUrl = 'https://github.com/kisitlikaynaklar/kisitlikaynaklar.github.io'
 String gitID = '999d62df-f2af-443c-935b-31c16ed196bb'
 
 def WebTest = {
@@ -22,10 +22,36 @@ def WebBuild = {
   '''
 }
 
+def GitMerge = {
+  checkout([
+    $class: 'GitSCM',
+    branches: [[name: 'refs/heads/dev']],
+    userRemoteConfigs: [[
+      credentialsId: gitID,
+      name: 'origin',
+      url: gitUrl
+    ]],
+    extensions: [
+    [
+      $class: 'PreBuildMerge',
+      options: [
+        fastForwardMode: 'FF',
+        mergeRemote: 'origin',
+        mergeStrategy: 'MergeCommand.Strategy',
+        mergeTarget: 'master'
+      ]
+    ],
+    [
+      $class: 'LocalBranch',
+      localBranch: 'master'
+    ]]
+  ])
+}
+
 stage('Dev Environment'){ // for display purposes
   node('web-dev') {
     stage('Prepare') { // for display purposes
-      git branch: 'dev', credentialsId: gitID, url: giturl
+      git branch: 'dev', credentialsId: gitID, url: gitUrl
     }
     stage('Install') {
       WebInstall()
@@ -44,20 +70,35 @@ stage('Dev-Test'){
 }
 
 stage('Stage Environment'){
-  build job: 'web-stage-serve'
+  node('web-dev') {
+    stage('Prepare') { // for display purposes
+      git branch: 'dev', credentialsId: gitID, url: gitUrl
+    }
+    stage('Install') {
+      WebInstall()
+    }
+    stage('Build') {
+      WebBuild()
+    }
+    step([$class: 'WsCleanup'])
+  }
 }
 
 stage('Stage Test'){
   node('web-stage') {
-    sh 'echo $HOSTNAME && /usr/local/bin/web-test.sh'
+    WebTest()
   }
 }
 
 stage('Pre-prod Tests') {
   parallel 'web-dev-test':{
-    node('web-dev'){ sh 'echo $HOSTNAME && /usr/local/bin/web-test.sh' }
+    node('web-dev'){
+      WebTest()
+    }
   }, 'web-stage-test':{
-    node('web-stage'){ sh 'echo $HOSTNAME &&  /usr/local/bin/web-test.sh' }
+    node('web-stage'){
+      WebTest()
+    }
   }
 }
 
@@ -67,49 +108,21 @@ timeout(time:1, unit:'MINUTES') {
 
 stage('Merge dev to master'){
   node{
-    checkout([
-      $class: 'GitSCM',
-      branches: [[name: 'refs/heads/dev']],
-      userRemoteConfigs: [[
-        credentialsId: gitID,
-        name: 'origin',
-        url: giturl
-      ]],
-      extensions: [
-      [
-        $class: 'PreBuildMerge',
-        options: [
-          fastForwardMode: 'FF',
-          mergeRemote: 'origin',
-          mergeStrategy: 'MergeCommand.Strategy',
-          mergeTarget: 'master'
-        ]
-      ],
-      [
-        $class: 'LocalBranch',
-        localBranch: 'master'
-      ]]
-    ])
+    GitMerge()
+    step([$class: 'WsCleanup'])
   }
 }
-
 
 stage('Production'){
   node('web-prod') {
     stage('Prepare') {
-      git branch: 'master', credentialsId: gitID, url: giturl
+      git branch: 'master', credentialsId: gitID, url: gitUrl
     }
     stage('Install') {
-      sh "bundle install"
+      WebInstall()
     }
     stage('Build') {
-      sh "jekyll build"
-      sh '''
-      rm -rf /var/www/html/*
-      mv _site/* /var/www/html/
-      cp htaccess /var/www/html/.htaccess
-      chown -R apache:apache /var/www/html
-      '''
+      WebBuild()
     }
     step([$class: 'WsCleanup'])
   }
@@ -117,11 +130,17 @@ stage('Production'){
 
 stage('Tests') {
   parallel 'web-dev-test':{
-    node('web-dev'){ sh 'echo $HOSTNAME && /usr/local/bin/web-test.sh' }
+    node('web-dev'){
+      WebTest()
+    }
   }, 'web-stage-test':{
-    node('web-stage'){ sh 'echo $HOSTNAME &&  /usr/local/bin/web-test.sh' }
+    node('web-stage'){
+      WebTest()
+    }
   }, 'web-prod-test':{
-    node('web-prod'){ sh 'echo $HOSTNAME &&  /usr/local/bin/web-test.sh' }
+    node('web-prod'){
+      WebTest()
+    }
   }
 }
 stage('Result') {
