@@ -48,6 +48,14 @@ def GitMerge = {
   ])
 }
 
+stage('Merge'){
+  node{
+    git branch: 'master', credentialsId: gitID, url: gitUrl
+    GitMerge()
+    step([$class: 'WsCleanup'])
+  }
+}
+
 stage('Dev Environment'){ // for display purposes
   node('web-dev') {
     stage('Prepare') { // for display purposes
@@ -106,7 +114,7 @@ timeout(time:1, unit:'MINUTES') {
     input message:'Approve deployment?', ok: 'Go ahead'
 }
 
-stage('Merge dev to master'){
+stage('Merge'){
   node{
     GitMerge()
     step([$class: 'WsCleanup'])
