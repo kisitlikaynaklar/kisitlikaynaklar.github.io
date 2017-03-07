@@ -46,11 +46,14 @@ def GitMerge = {
       localBranch: 'dev'
     ]]
   ])
+  withCredentials([[$class: 'UsernamePasswordMultiBinding', credentialsId: gitID, usernameVariable: 'GIT_USERNAME', passwordVariable: 'GIT_PASSWORD']]) {
+    sh("git tag -a master -m 'Jenkins'")
+    sh('git push https://${GIT_USERNAME}:${GIT_PASSWORD}@gitUrl --tags')
+}
 }
 
 stage('Merge'){
   node{
-
     GitMerge()
   }
 }
