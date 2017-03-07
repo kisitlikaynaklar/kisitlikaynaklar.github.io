@@ -46,8 +46,8 @@ def GitMerge = {
       localBranch: 'dev'
     ]]
   ])
-  withCredentials([[$class: 'UsernamePasswordMultiBinding', credentialsId: gitID, usernameVariable: 'GIT_USERNAME', passwordVariable: 'GIT_PASSWORD']]) {
-    sh('git push https://${GIT_USERNAME}:${GIT_PASSWORD}@gitUrl')
+  withCredentials([[$class: 'UsernamePasswordMultiBinding', credentialsId: gitID, usernameVariable: 'gitUsername', passwordVariable: 'gitPassword']]) {
+    sh('git push https://${gitUsername}:${gitPassword}@${gitUrl}')
 }
 }
 
